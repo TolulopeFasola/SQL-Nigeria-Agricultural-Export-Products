@@ -1,0 +1,109 @@
+select * from agro;
+update agro
+set date = STR_TO_DATE(date,"%m/%d/%Y");
+
+alter table agro
+modify date DATE;
+
+-- Top selling products
+select product_name, SUM(units_sold * unit_price) AS total_sales
+from agro
+group by product_name
+order by total_sales DESC;
+
+-- Company with the highest sales revenue
+select company, SUM(units_sold * unit_price) AS total_sales
+from agro
+group by company
+order by company DESC;
+
+-- Sales variation across different countries
+select export_country, product_name, round((units_sold * unit_price)) AS total_sales
+from agro
+group by export_country, product_name
+order by export_country ASC, total_sales DESC;
+
+-- AVG Sales variation across different countries
+select export_country, round(AVG(units_sold * unit_price)) AS AVG_sales
+from agro
+group by export_country
+order by AVG_sales DESC;
+
+-- Correlation between units sold and profits generated
+select export_country, sum(units_sold) AS units_sold,  sum(units_sold * profit_per_unit) AS total_profit
+from agro
+group by export_country
+order by units_sold DESC;
+
+-- 
+select  export_country, sum(units_sold) AS units, sum(units_sold * profit_per_unit) AS total_profit
+from agro
+group by export_country
+order by total_profit DESC;
+
+-- How do sales vary over time ( Year)? 
+select year(date) AS year_, Sum(units_sold * unit_price) AS revenue
+from agro
+group by year_
+order by revenue DESC;
+-- How do sales vary over time ( Year/ Month)? 
+select year(date) AS year_, monthname(date) AS month_, Sum(units_sold * unit_price) AS revenue
+from agro
+group by year_, month_
+order by revenue DESC;
+
+-- How do sales vary over time ( Year/ QTR)? 
+select year(date) AS year_, concat("Qtr",Quarter(date)) AS Qtr, round(sum(units_sold * unit_price),2) AS revenue
+from agro
+group by year_, Qtr
+order by revenue DESC;
+
+-- Relationship between date of purchase and profit margin
+select date, total_sales, profit_, round((profit_ / total_sales),2) * 100 AS profit_margin
+from(
+select date, (units_sold * unit_price) AS total_sales, round(sum(units_sold * profit_per_unit),2) AS profit_
+from agro
+group by date) AS sub
+order by profit_margin DESC;
+
+-- Variation in cost of goods across different products
+Select product_name, revenue, profit_, (revenue - profit_) AS cost
+from(
+select product_name, round(sum(units_sold * unit_price),2) AS revenue, round(sum(units_sold * profit_per_unit),2) AS profit_
+from agro
+group by
+product_name) AS sub;
+
+-- Common transportation modes for export
+select transportation_mode
+from agro;
+
+-- Top export product for each port
+select product_name, export_value, destination_port
+from agro
+group by destination_port
+order by export_value DESC;
+
+-- Product performance in terms of profit margin
+select product_name, profit_, round((profit_ / total_sales),2) * 100 AS profit_margin
+from(
+select(units_sold * unit_price) AS total_sales, product_name, round(sum(units_sold * profit_per_unit),2) AS profit_
+from agro
+group by product_name) AS sub
+order by profit_margin DESC;
+
+-- Destination port rank by export value
+select company, units_sold, round(sum(units_sold * profit_per_unit),2) AS profit_, export_country, destination_port
+from agro
+group by company
+order by profit_ DESC;
+
+
+select  (revenue - profit_) AS cost
+from(
+SELECT SUM(units_sold * unit_price) AS revenue, round(sum(units_sold * profit_per_unit),2) AS profit_, units_sold, count(distinct product_name) AS products
+from agro) AS sub;
+
+-- Units sold and profit generated
+SELECT SUM(units_sold * unit_price) AS revenue, round(sum(units_sold * profit_per_unit),2) AS profit_, units_sold, count(distinct product_name) AS products
+from agro;
