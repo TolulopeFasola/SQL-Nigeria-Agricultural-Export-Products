@@ -1,110 +1,99 @@
-# SQL-Nigeria-Agricultural-Export-Products
-select * from agro;
-update agro
-set date = STR_TO_DATE(date,"%m/%d/%Y");
+# Nigeria-Agricultural-Exports
+## Project Overview
 
-alter table agro
-modify date DATE;
+Nigeria Agricultural Exports (2021-2023) play a significant role in the country's economy contributing to foreign exchange earnings and providing livelihood for people. This analysis aims to point out significant contributions from agricultural products to the economy. For this project, I harnessed the power of data modelling and visualization to create interactive tableau dashboard. [Click here](https://public.tableau.com/views/Agriculturalexporttableau/Dashboard1?:language=en-US&publish=yes&:sid=&:display_count=n&:origin=viz_share_link) to view dashboard. This  nalysis willtransform data into actionable insights. 
+## Data Source
 
--- Top selling products
-select product_name, SUM(units_sold * unit_price) AS total_sales
-from agro
-group by product_name
-order by total_sales DESC;
+The dataset used for this project was shared by an analyst on X. The dataset provides a comprehensive view of sales performance, cost analysis and geographical distribution of Nigeria's agricultural exports.
 
--- Company with the highest sales revenue
-select company, SUM(units_sold * unit_price) AS total_sales
-from agro
-group by company
-order by company DESC;
+## Data Source
 
--- Sales variation across different countries
-select export_country, product_name, round((units_sold * unit_price)) AS total_sales
-from agro
-group by export_country, product_name
-order by export_country ASC, total_sales DESC;
+The dataset used for this analysis "nigeria_agricultural_exports.csv"is csv file. The file contains information about export products, countries, company and other information on Nigeria agricultural export.
 
--- AVG Sales variation across different countries
-select export_country, round(AVG(units_sold * unit_price)) AS AVG_sales
-from agro
-group by export_country
-order by AVG_sales DESC;
+## Tools & Skills
 
--- Correlation between units sold and profits generated
-select export_country, sum(units_sold) AS units_sold,  sum(units_sold * profit_per_unit) AS total_profit
-from agro
-group by export_country
-order by units_sold DESC;
+- Excel : Data Cleaning
+- SQL : Analysis
+- Tableau : Data Visualization
 
--- 
-select  export_country, sum(units_sold) AS units, sum(units_sold * profit_per_unit) AS total_profit
-from agro
-group by export_country
-order by total_profit DESC;
-
--- How do sales vary over time ( Year)? 
-select year(date) AS year_, Sum(units_sold * unit_price) AS revenue
-from agro
-group by year_
-order by revenue DESC;
--- How do sales vary over time ( Year/ Month)? 
-select year(date) AS year_, monthname(date) AS month_, Sum(units_sold * unit_price) AS revenue
-from agro
-group by year_, month_
-order by revenue DESC;
-
--- How do sales vary over time ( Year/ QTR)? 
-select year(date) AS year_, concat("Qtr",Quarter(date)) AS Qtr, round(sum(units_sold * unit_price),2) AS revenue
-from agro
-group by year_, Qtr
-order by revenue DESC;
-
--- Relationship between date of purchase and profit margin
-select date, total_sales, profit_, round((profit_ / total_sales),2) * 100 AS profit_margin
-from(
-select date, (units_sold * unit_price) AS total_sales, round(sum(units_sold * profit_per_unit),2) AS profit_
-from agro
-group by date) AS sub
-order by profit_margin DESC;
-
--- Variation in cost of goods across different products
-Select product_name, revenue, profit_, (revenue - profit_) AS cost
-from(
-select product_name, round(sum(units_sold * unit_price),2) AS revenue, round(sum(units_sold * profit_per_unit),2) AS profit_
-from agro
-group by
-product_name) AS sub;
-
--- Common transportation modes for export
-select transportation_mode
-from agro;
-
--- Top export product for each port
-select product_name, export_value, destination_port
-from agro
-group by destination_port
-order by export_value DESC;
-
--- Product performance in terms of profit margin
-select product_name, profit_, round((profit_ / total_sales),2) * 100 AS profit_margin
-from(
-select(units_sold * unit_price) AS total_sales, product_name, round(sum(units_sold * profit_per_unit),2) AS profit_
-from agro
-group by product_name) AS sub
-order by profit_margin DESC;
-
--- Destination port rank by export value
-select company, units_sold, round(sum(units_sold * profit_per_unit),2) AS profit_, export_country, destination_port
-from agro
-group by company
-order by profit_ DESC;
+## Visualization and Reports
 
 
-select  (revenue - profit_) AS cost
-from(
-SELECT SUM(units_sold * unit_price) AS revenue, round(sum(units_sold * profit_per_unit),2) AS profit_, units_sold, count(distinct product_name) AS products
-from agro) AS sub;
+- Key metrics card : I employed these cards to highlight important metrics such as revenue, profit, total units, total products and total cost.
+- Map : Implemented the map to give information on average revenue by each country.
+- Horizontal bar chart : created the chart to give narratives on top 5 products generating the highest revenue.
+- Table : Employed this table to highlight export countries by product sales.
+- Bubble chart : This chart visualizes information on destination by there export values.
+- Line chart : Crated this chart to show trend in revenue and profit margine by year and month.
+- Note : A note is also added to this dashboard to give insights on what the analysis entails.
 
--- Units sold and profit generated
-SELECT SUM(units_sold * unit_price) AS revenue, round(sum(units_sold * profit_per_unit),2) AS profit_, units_sold, count(distinct product_name) AS products
-from agro;
+## Insights
+
+- ### Sales Performance Analysis
+
+#### 1. Top selling products
+
+The dataset reveals that cocoa, sesame, rubber, cashew are among the top selling products. However, cocoa has the highest revenue generated in terms of export 2.4bn follow by sesame.
+
+#### 2. Company with the highest sales revenue
+
+The dataset shows that Nigeria Agro Export Company has the highest product sales follow by Goldern Farms LTD and other companies as seen in the chart.
+
+#### 3. Sales variation across different countries
+
+-	Product sales: Italy and France were the largest importers in terms of sales revenue
+- average revenue per country :Countries like Italy and France are the largesst importers interms of average revenue per units sold.
+   Total units sold : Demark, Italy and France are the largest importers in terms of units sold. Demark happens to be the country with the highest value of products exported and units of products sold.
+
+#### 4. Correlation between units sold and profits generated
+
+The correlation indicated that the higher units of products purchsed, the higher the profits generated.
+
+### Time Analysis:
+
+#### 1. How do sales vary over time?
+
+QTR 4, Octoer, 2021 happens to be the time of the year with the highest sales. 
+
+#### 2. Relationship between date of purchase and profit margin
+
+The relationship shows that starting from 2020 to 2023, there was increase in profit margin in 2023.
+
+### Cost Analysis :
+
+Variation in cost of goods across different products
+
+Products like cocoa has higher COGS due to processing time and transportation cost.
+
+### Geographycal Analysis:
+   
+#### 1. Destination port with highest volume of exports
+
+The Lagos port has the highest volume of exports and this is between 2021 and 2023.
+
+#### 2. Common transportation modes for export
+
+ From the analysis, sea is the only mode of transportation of all export products.
+ 
+#### 3. Top export product for each port
+
+products, units, ports
+Rubber	599	Lagos
+Rubber	141	Warri
+Cassava	133	Port Harcourt
+Cassava	127	Calabar
+
+#### 4. Destination port rank by export value
+
+Lagos has the highest export value and this due to high volume of rubber, cassava, rubber.
+
+### Performance comparison:
+
+Product performance in terms of profit margin
+Sesame, ginger, cassava are products with higher profit margin.
+
+#### Units sold and profit generated
+
+The performance shows that there are companies that have lesser units of products sold but however, generated more profits.This is because of them happen to have Lagos as their destination port.
+
+
